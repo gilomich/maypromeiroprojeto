@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataVision | Gráfico Dinâmico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-6">
+
+    <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        
+        <div class="glass-card p-8 shadow-2xl">
+            <h1 class="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                DataVision AI
+            </h1>
+            <p class="text-slate-400 mb-8">Altere os valores abaixo para ver a mágica acontecer em tempo real.</p>
+            
+            <div id="controls" class="space-y-6">
+                </div>
+
+            <button onclick="resetData()" class="mt-8 w-full py-3 rounded-xl bg-slate-700 hover:bg-slate-600 transition-all font-semibold">
+                Resetar Valores
+            </button>
+        </div>
+
+        <div class="glass-card p-8 flex flex-col items-center justify-center min-h-[400px]">
+            <canvas id="myChart"></canvas>
+        </div>
+
+    </div>
+
+    <script>
+        // Configurações Iniciais
+        const dataValues = [30, 20, 15, 35];
+        const labels = ['Inovação', 'Design', 'Performance', 'Usabilidade'];
+        const colors = [
+            'rgba(59, 130, 246, 0.8)',   // Blue
+            'rgba(16, 185, 129, 0.8)',   // Emerald
+            'rgba(249, 115, 22, 0.8)',   // Orange
+            'rgba(139, 92, 246, 0.8)'    // Violet
+        ];
+
+        // Inicialização do Gráfico
+        const ctx = document.getElementById('myChart').getContext('2d');
+        let myChart = new Chart(ctx, {
+            type: 'doughnut', // Estilo rosquinha é mais moderno que pizza cheia
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: dataValues,
+                    backgroundColor: colors,
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 2,
+                    hoverOffset: 20
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#94a3b8', font: { size: 14 } }
+                    }
+                },
+                cutout: '70%', // Deixa o centro mais vazio (estilo moderno)
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        });
+
+        // Gerar Controles Dinamicamente
+        const controlsContainer = document.getElementById('controls');
+        
+        labels.forEach((label, index) => {
+            const div = document.createElement('div');
+            div.innerHTML = `
+                <div class="flex justify-between mb-2">
+                    <label class="text-sm font-medium text-slate-300">${label}</label>
+                    <span id="val-${index}" class="text-sm font-bold text-blue-400">${dataValues[index]}%</span>
+                </div>
+                <input type="range" 
+                    class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                    value="${dataValues[index]}" 
+                    min="0" max="100" 
+                    oninput="updateChart(${index}, this.value)">
+            `;
+            controlsContainer.appendChild(div);
+        });
+
+        // Função para atualizar o gráfico em tempo real
+        function updateChart(index, value) {
+            myChart.data.datasets[0].data[index] = value;
+            document.getElementById(`val-${index}`).innerText = value + '%';
+            myChart.update();
+        }
+
+        function resetData() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
